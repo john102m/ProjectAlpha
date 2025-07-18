@@ -1,0 +1,5 @@
+ApiGateway       "applicationUrl": "http://localhost:5028"
+UserService       "applicationUrl": "http://localhost:5031"
+CatalogService     "applicationUrl": "http://localhost:5029"
+EmailService       "applicationUrl": "http://localhost:5032"
+BookingService     "applicationUrl": "http://localhost:5030"
