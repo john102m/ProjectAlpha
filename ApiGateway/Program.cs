@@ -1,3 +1,5 @@
+//api gateway
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration

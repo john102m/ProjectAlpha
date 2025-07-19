@@ -4,7 +4,7 @@ namespace UserService.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class HomeController : ControllerBase
+    public class UserController : ControllerBase
     {
         [HttpGet]
         public IActionResult Get() => Ok("UserService is running!");

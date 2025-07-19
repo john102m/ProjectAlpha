@@ -7,6 +7,10 @@ services:
       - "5001:8080"
     depends_on:
       - rabbitmq
+      - postgres-catalog     # Add this dependency so catalog waits for DB
+    environment:
+      #- ConnectionStrings:CatalogDatabase=Host=postgres-catalog;Port=5432;Username=cataloguser;Password=catalogpass;Database=catalogdb
+      - ConnectionStrings__CatalogDatabase=Host=postgres-catalog;Port=5432;Username=cataloguser;Password=catalogpass;Database=catalogdb
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/home"]
       interval: 30s
@@ -19,6 +23,8 @@ services:
       dockerfile: BookingService/Dockerfile
     ports:
       - "5002:8080"
+    environment:
+      - RABBITMQ_HOST=rabbitmq 
     depends_on:
       - rabbitmq
     healthcheck:
@@ -39,6 +45,9 @@ services:
       dockerfile: EmailService/Dockerfile
     ports:
       - "5004:8080"
+    environment:
+      - DOTNET_EnableAnsiColor=true
+      - RABBITMQ_HOST=rabbitmq
     depends_on:
       - rabbitmq    
     healthcheck:
@@ -72,3 +81,22 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+  postgres-catalog:
+    image: postgres:15
+    container_name: postgres-catalog
+    environment:
+      POSTGRES_USER: cataloguser
+      POSTGRES_PASSWORD: catalogpass
+      POSTGRES_DB: catalogdb
+    ports:
+      - "5433:5432"  # maps host 5433 to container 5432 (Postgres default)
+    volumes:
+      - catalog_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cataloguser -d catalogdb"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  catalog_pgdata:

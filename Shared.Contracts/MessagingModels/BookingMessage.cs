@@ -1,4 +1,4 @@
-﻿namespace BookingService.Models
+﻿namespace Shared.Contracts.MessagingModels
 {
     public class BookingMessage
     {
@@ -7,6 +7,5 @@
         public string UserEmail { get; set; } = string.Empty;
 
         public string RoomType { get; set; } = string.Empty;
-
     }
 }
