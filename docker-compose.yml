@@ -1,16 +1,62 @@
+version: "3.9"
+
+networks:
+  internal:
+    driver: bridge
+  public:
+    driver: bridge
+
+volumes:
+  catalog_pgdata:
 
 services:
+  postgres-catalog:
+    image: postgres:15
+    container_name: postgres-catalog
+    ports:
+      - "5433:5432"
+
+    environment:
+      POSTGRES_USER: cataloguser
+      POSTGRES_PASSWORD: catalogpass
+      POSTGRES_DB: catalogdb
+    volumes:
+      - catalog_pgdata:/var/lib/postgresql/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cataloguser -d catalogdb"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmqctl status || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
   catalog:
     build:
       context: .
       dockerfile: CatalogService/Dockerfile
-    ports:
-      - "5001:8080"
     depends_on:
       - rabbitmq
-      - postgres-catalog     # Add this dependency so catalog waits for DB
+      - postgres-catalog
+    networks:
+      - internal
     environment:
-      #- ConnectionStrings:CatalogDatabase=Host=postgres-catalog;Port=5432;Username=cataloguser;Password=catalogpass;Database=catalogdb
       - ConnectionStrings__CatalogDatabase=Host=postgres-catalog;Port=5432;Username=cataloguser;Password=catalogpass;Database=catalogdb
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/products/health || exit 1"]
@@ -22,13 +68,12 @@ services:
     build:
       context: .
       dockerfile: BookingService/Dockerfile
-    ports:
-      - "5002:8080"
-    environment:
-      - RABBITMQ_HOST=rabbitmq 
     depends_on:
       - rabbitmq
-
+    networks:
+      - internal
+    environment:
+      - RABBITMQ_HOST=rabbitmq
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
       interval: 30s
@@ -39,81 +84,50 @@ services:
     build:
       context: .
       dockerfile: UserService/Dockerfile
-    ports:
-      - "5003:8080"
+    networks:
+      - internal
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/user/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
       interval: 30s
       timeout: 5s
-      retries: 3  
+      retries: 3
 
   email:
     build:
       context: .
       dockerfile: EmailService/Dockerfile
-    ports:
-      - "5004:8080"
-    environment:
-      - DOTNET_EnableAnsiColor=true
-      - RABBITMQ_HOST=rabbitmq
     depends_on:
-      - rabbitmq    
+      - rabbitmq
+    networks:
+      - internal
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - DOTNET_EnableAnsiColor=true
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/email/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
       interval: 30s
       timeout: 5s
-      retries: 3 
+      retries: 3
 
   apigateway:
     build:
       context: .
       dockerfile: ApiGateway/Dockerfile
     ports:
-      - "5000:8080"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Production  
+      - "5000:8080" # exposed externally
     depends_on:
-      - rabbitmq
       - catalog
       - booking
       - user
       - email
+      - rabbitmq
+    networks:
+      - public
+      - internal
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/gateway/health || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
-
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
-    ports:
-      - "5672:5672"     # message broker port
-      - "15672:15672"   # RabbitMQ Management UI
-    environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
-    healthcheck:
-      test: ["CMD-SHELL", "rabbitmqctl status || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-  postgres-catalog:
-    image: postgres:15
-    container_name: postgres-catalog
-    environment:
-      POSTGRES_USER: cataloguser
-      POSTGRES_PASSWORD: catalogpass
-      POSTGRES_DB: catalogdb
-    ports:
-      - "5433:5432"  # maps host 5433 to container 5432 (Postgres default)
-    volumes:
-      - catalog_pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U cataloguser -d catalogdb"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-
-volumes:
-  catalog_pgdata:

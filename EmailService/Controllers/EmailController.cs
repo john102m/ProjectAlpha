@@ -3,7 +3,7 @@
 namespace EmailService.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("")]
     public class EmailController : ControllerBase
     {
         [HttpGet("health")]

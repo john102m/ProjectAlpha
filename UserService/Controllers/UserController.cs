@@ -3,7 +3,8 @@
 namespace UserService.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    //[Route("[controller]")]
+    [Route("")]
     public class UserController : ControllerBase
     {
         [HttpGet("health")]

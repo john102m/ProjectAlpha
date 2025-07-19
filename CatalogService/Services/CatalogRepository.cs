@@ -71,6 +71,9 @@ namespace CatalogService.Services
                 price = @Price
             WHERE id = @Id;";
             var rows = await db.ExecuteAsync(sql, new { product.Name, product.Description, product.Price, Id = id });
+
+            _logger.LogInformation("UpdateProductAsync: {Rows} updated", rows);
+
             return rows > 0;
         }
 
@@ -79,6 +82,9 @@ namespace CatalogService.Services
             using IDbConnection db = new NpgsqlConnection(_connectionString);
             var sql = "DELETE FROM products WHERE id = @Id";
             var rows = await db.ExecuteAsync(sql, new { Id = id });
+
+            _logger.LogInformation("DeleteProductAsync: {Rows} deleted", rows);
+
             return rows > 0;
         }
     }

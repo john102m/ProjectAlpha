@@ -1,8 +1,11 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using Serilog;
+using Shared.Contracts.Common;
+
 
 var builder = WebApplication.CreateBuilder(args);
+LoggingConfigurator.Configure();
+
+builder.Host.UseSerilog();  // Replace default logger with Serilog
 builder.Services.AddControllers();
 
 var app = builder.Build();

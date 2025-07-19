@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RabbitMQ.Client;
-using Serilog;
 using Shared.Contracts.MessagingModels;
 using System.Diagnostics;
 using System.Text;

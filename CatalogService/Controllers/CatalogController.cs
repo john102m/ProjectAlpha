@@ -55,7 +55,10 @@ namespace CatalogService.Controllers
         public async Task<IActionResult> UpdateProduct(int id, [FromBody] Product updatedProduct)
         {
             var success = await _repo.UpdateProductAsync(id, updatedProduct);
-            return success ? Ok(updatedProduct) : NotFound();
+            return success ? Ok(updatedProduct) : NotFound(new
+            {
+                message = $"Product with ID {id} not found. Cannot update."
+            });
         }
 
         // 🔴 DELETE product
@@ -63,7 +66,10 @@ namespace CatalogService.Controllers
         public async Task<IActionResult> DeleteProduct(int id)
         {
             var success = await _repo.DeleteProductAsync(id);
-            return success ? Ok("Product removed") : NotFound();
+            return success ? Ok("Product removed") : NotFound(new
+            {
+                message = $"Product with ID {id} not found. Cannot delete."
+            });
         }
     }
 }
