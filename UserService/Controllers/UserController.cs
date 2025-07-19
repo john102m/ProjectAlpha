@@ -6,7 +6,7 @@ namespace UserService.Controllers
     [Route("[controller]")]
     public class UserController : ControllerBase
     {
-        [HttpGet]
+        [HttpGet("health")]
         public IActionResult Get() => Ok("UserService is running!");
     }
 }

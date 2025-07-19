@@ -1,5 +1,11 @@
 # Use the official ASP.NET runtime image as base
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+# booking service
+# Replace this:
+# FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+
+# With your custom base image:
+FROM projectalpha-base:8.0 AS base
+
 WORKDIR /app
 EXPOSE 80
 

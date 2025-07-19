@@ -19,7 +19,7 @@ namespace BookingService.Controllers
             _logger = logger;
         }
 
-        [HttpGet]
+        [HttpGet("health")]
         public IActionResult Get() => Ok("BookingService is running!");
 
         [HttpPost("book")]

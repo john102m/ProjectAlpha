@@ -6,7 +6,7 @@ namespace EmailService.Controllers
     [Route("[controller]")]
     public class EmailController : ControllerBase
     {
-        [HttpGet]
+        [HttpGet("health")]
         public IActionResult Get() => Ok("EmailService is running!");
     }
 }

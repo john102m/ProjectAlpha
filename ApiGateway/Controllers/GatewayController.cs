@@ -6,7 +6,7 @@ namespace ApiGateway.Controllers
     [Route("[controller]")]
     public class GatewayController : ControllerBase
     {
-        [HttpGet]
+        [HttpGet("health")]
         public IActionResult Get() => Ok("ApiGateway is running!");
     }
 }

@@ -16,7 +16,7 @@ namespace CatalogService.Controllers
             _configuration = configuration;
             _repo = repo;
         }
-        [HttpGet("ping")]
+        [HttpGet("health")]
         public IActionResult Get()
         {
             return Ok("📦 CatalogService is alive and responding!");
