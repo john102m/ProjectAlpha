@@ -13,7 +13,7 @@ services:
     image: postgres:15
     container_name: postgres-catalog
     ports:
-      - "5444:5432" #to allow VS2022 to access postgres
+      - "5444:5432" #to allow VS2022 or pgAdmin to access postgres
 
     environment:
       POSTGRES_USER: cataloguser
@@ -62,7 +62,7 @@ services:
     environment:
       - ConnectionStrings__CatalogDatabase=Host=postgres-catalog;Port=5432;Username=cataloguser;Password=catalogpass;Database=catalogdb
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/products/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/packages/health || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -71,6 +71,8 @@ services:
     build:
       context: .
       dockerfile: BookingService/Dockerfile
+    ports:
+      - "6000:8080"  # expose booking outwith the apigateway  eg host:6000/book/ (for gateway use host:5000/booking/book/)
     depends_on:
       - rabbitmq
     networks:

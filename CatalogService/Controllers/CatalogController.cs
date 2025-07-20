@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CatalogService.Controllers
 {
     [ApiController]
-    [Route("products")]
+    [Route("packages")]
     public class CatalogController : ControllerBase
     {
         private readonly IConfiguration _configuration;
@@ -59,7 +59,7 @@ namespace CatalogService.Controllers
             var created = await _repo.CreateProductAsync(product);
             if (created == null)
             {
-                return Problem("Failed to create product", statusCode: 500);
+                return Problem("Failed to create package", statusCode: 500);
             }
             return CreatedAtAction(nameof(GetProduct), new { id = created.Id }, created);
         }
@@ -71,7 +71,7 @@ namespace CatalogService.Controllers
             var success = await _repo.UpdateProductAsync(id, updatedProduct);
             return success ? Ok(updatedProduct) : NotFound(new
             {
-                message = $"Product with ID {id} not found. Cannot update."
+                message = $"Package with ID {id} not found. Cannot update."
             });
         }
 
@@ -80,9 +80,9 @@ namespace CatalogService.Controllers
         public async Task<IActionResult> DeleteProduct(int id)
         {
             var success = await _repo.DeleteProductAsync(id);
-            return success ? Ok("Product removed") : NotFound(new
+            return success ? Ok("Package removed") : NotFound(new
             {
-                message = $"Product with ID {id} not found. Cannot delete."
+                message = $"Package with ID {id} not found. Cannot delete."
             });
         }
     }

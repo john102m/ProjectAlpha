@@ -21,7 +21,7 @@ namespace CatalogService.Services
             try
             {
                 using IDbConnection db = new NpgsqlConnection(_connectionString);
-                var sql = "SELECT id, name, description, price FROM products";
+                var sql = "SELECT id, name, description, price FROM catalog.packages";
                 return await db.QueryAsync<Product>(sql);
             }
             catch (Exception ex)
@@ -36,7 +36,7 @@ namespace CatalogService.Services
         public async Task<Product?> GetProductByIdAsync(int id)
         {
             using IDbConnection db = new NpgsqlConnection(_connectionString);
-            var sql = "SELECT id, name, description, price FROM products WHERE id = @Id";
+            var sql = "SELECT id, name, description, price FROM catalog.packages WHERE id = @Id";
             return await db.QuerySingleOrDefaultAsync<Product>(sql, new { Id = id });
         }
 
@@ -46,7 +46,7 @@ namespace CatalogService.Services
             {
                 using IDbConnection db = new NpgsqlConnection(_connectionString);
                 var sql = @"
-                INSERT INTO products (name, description, price)
+                INSERT INTO catalog.packages (name, description, price)
                 VALUES (@Name, @Description, @Price)
                 RETURNING id;";
                 var id = await db.ExecuteScalarAsync<int>(sql, product);
@@ -66,7 +66,7 @@ namespace CatalogService.Services
         {
             using IDbConnection db = new NpgsqlConnection(_connectionString);
             var sql = @"
-            UPDATE products
+            UPDATE catalog.packages
             SET name = @Name,
                 description = @Description,
                 price = @Price
@@ -81,7 +81,7 @@ namespace CatalogService.Services
         public async Task<bool> DeleteProductAsync(int id)
         {
             using IDbConnection db = new NpgsqlConnection(_connectionString);
-            var sql = "DELETE FROM products WHERE id = @Id";
+            var sql = "DELETE FROM catalog.packages WHERE id = @Id";
             var rows = await db.ExecuteAsync(sql, new { Id = id });
 
             _logger.LogInformation("DeleteProductAsync: {Rows} deleted", rows);
