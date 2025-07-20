@@ -15,11 +15,13 @@ namespace BookingService.Controllers
     {
         private readonly ILogger<BookingController> _logger;        
         private readonly IBookingRepository _repo;
+        private readonly IMessageService _messageService;
 
-        public BookingController(ILogger<BookingController> logger,IBookingRepository repo)
+        public BookingController(ILogger<BookingController> logger,IBookingRepository repo, IMessageService messageService)
         {
             _logger = logger;
             _repo = repo;
+            _messageService = messageService;
         }
 
         [HttpGet("health")]
@@ -28,27 +30,15 @@ namespace BookingService.Controllers
         [HttpPost("book")]
         public async Task<IActionResult> PostBookingAsync()
         {
-            var rabbitHost = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "localhost";
-            var factory = new ConnectionFactory() { HostName = rabbitHost };
-
-            using var connection = await factory.CreateConnectionAsync();
-            using var channel = await connection.CreateChannelAsync();
-
-            await channel.QueueDeclareAsync(queue: "booking-confirmed", durable: false, exclusive: false, autoDelete: false);
 
             var booking = new BookingMessage
             {
-                BookingId = "123",
-                UserEmail = "alice@example.com",
-                RoomType = "Deluxe Suite"
+                BookingId = 123,
+                Username = "Test User Bobby",
+                PackageRef = 12
             };
 
-            var json = JsonSerializer.Serialize(booking);
-            var body = Encoding.UTF8.GetBytes(json);
-
-            await channel.BasicPublishAsync(exchange: "", routingKey: "booking-confirmed", body: body);
-            Debug.WriteLine($"📩 Booking confirmed and message sent. #{booking?.BookingId} | {booking?.UserEmail} | {booking?.RoomType}");
-            _logger.LogInformation($"📩 Booking confirmed and message sent. #{booking?.BookingId} | {booking?.UserEmail} | {booking?.RoomType}");
+            await _messageService.PublishBookingAsync(booking);
             return Ok("Booking confirmed and message sent.");
         }
 
@@ -71,6 +61,14 @@ namespace BookingService.Controllers
         public async Task<IActionResult> CreateReservation([FromBody] Reservation reservation)
         {
             var created = await _repo.CreateReservationAsync(reservation);
+            var booking = new BookingMessage
+            {
+                BookingId = reservation.Id,
+                Username = reservation.GuestName, 
+                PackageRef = reservation.PackageId,
+            };
+            _ = _messageService.PublishBookingAsync(booking);
+
             return CreatedAtAction(nameof(GetReservation), new { id = created.Id }, created);
         }
 
@@ -85,7 +83,7 @@ namespace BookingService.Controllers
         public async Task<IActionResult> DeleteReservation(int id)
         {
             var deleted = await _repo.DeleteReservationAsync(id);
-            return deleted ? NoContent() : NotFound();
+            return deleted ? Ok($"Reservation Id: {id} deleted") : NotFound();
         }
 
         [HttpGet("reservations/packageinfo")]
@@ -95,12 +93,12 @@ namespace BookingService.Controllers
             return Ok(reservations);
         }
         [HttpGet("reservations/search")]
-        public async Task<IActionResult> SearchReservationsByGuest([FromQuery] string guestName)
+        public async Task<IActionResult> SearchReservationsByGuest([FromQuery] string searchTerm)
         {
-            if (string.IsNullOrWhiteSpace(guestName))
+            if (string.IsNullOrWhiteSpace(searchTerm))
                 return BadRequest("Guest name must be provided.");
 
-            var matches = await _repo.SearchReservationsAsync(guestName);
+            var matches = await _repo.SearchReservationsAsync(searchTerm);
             return Ok(matches);
         }
 

@@ -63,8 +63,8 @@ namespace EmailService.Services
                     var json = Encoding.UTF8.GetString(body);
                     var booking = JsonSerializer.Deserialize<BookingMessage>(json);
 
-                    Debug.WriteLine($"📩 Received booking #{booking?.BookingId} for {booking?.UserEmail} → {booking?.RoomType}");
-                    _logger.LogInformation($"📩 Received booking #{booking?.BookingId} for {booking?.UserEmail} → {booking?.RoomType}");
+                    Debug.WriteLine($"📩 Received booking #{booking?.BookingId} for {booking?.Username} → {booking?.PackageRef}");
+                    _logger.LogInformation($"📩 Received booking #{booking?.BookingId} for {booking?.Username} → {booking?.PackageRef}");
                 }
                 catch (Exception ex)
                 {

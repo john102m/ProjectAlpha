@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 LoggingConfigurator.Configure();
 
 builder.Host.UseSerilog();  // Replace default logger with Serilog
-
+builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IBookingRepository>(provider =>
 {
     var config = provider.GetRequiredService<IConfiguration>();

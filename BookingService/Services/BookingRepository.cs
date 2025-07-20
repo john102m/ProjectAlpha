@@ -86,7 +86,7 @@ namespace BookingService.Services
             return await connection.QueryAsync<BookingWithPackageDto>(sql);
         }
 
-        public async Task<IEnumerable<BookingWithPackageDto>> SearchReservationsAsync(string guestName)
+        public async Task<IEnumerable<BookingWithPackageDto>> SearchReservationsAsync(string searchTerm)
         {
             const string sql = @"
         SELECT 
@@ -101,10 +101,15 @@ namespace BookingService.Services
             p.price AS packageBasePrice
         FROM booking.reservations r
         JOIN catalog.packages p ON r.packageid = p.id
-        WHERE r.guestname ILIKE @Query";
+        WHERE r.guest_search_vector @@ to_tsquery('english', @Query)
+        OR r.guestname ILIKE @Fallback;"; //WHERE r.guestname ILIKE @Query";
 
             using var connection = new NpgsqlConnection(_connectionString);
-            return await connection.QueryAsync<BookingWithPackageDto>(sql, new { Query = $"%{guestName}%" });
+            return await connection.QueryAsync<BookingWithPackageDto>(sql, new
+            {
+                Query = searchTerm,                    // e.g. "oliv:*"
+                Fallback = $"%{searchTerm.Replace(":*", "")}%"  // e.g. "oliv" → "%oliv%"
+            });
         }
 
 

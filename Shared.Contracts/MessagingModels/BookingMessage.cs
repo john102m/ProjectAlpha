@@ -2,10 +2,12 @@
 {
     public class BookingMessage
     {
-        public string BookingId { get; set; } = string.Empty;
+        public int BookingId { get; set; }
 
-        public string UserEmail { get; set; } = string.Empty;
+        public string Username { get; set; } = string.Empty;
 
-        public string RoomType { get; set; } = string.Empty;
+        public int PackageRef { get; set; }
+
+        public DateTime CreatedAt { get; set; }
     }
 }
