@@ -1,11 +1,10 @@
-version: "3.9"
 
 networks:
   internal:
     driver: bridge
   public:
     driver: bridge
-
+     
 volumes:
   catalog_pgdata:
 
@@ -14,7 +13,7 @@ services:
     image: postgres:15
     container_name: postgres-catalog
     ports:
-      - "5433:5432"
+      - "5444:5432" #to allow VS2022 to access postgres
 
     environment:
       POSTGRES_USER: cataloguser
@@ -56,6 +55,8 @@ services:
       - postgres-catalog
     networks:
       - internal
+    ports:
+      - "5433:5432"   #temporary for dev access- 
     environment:
       - ConnectionStrings__CatalogDatabase=Host=postgres-catalog;Port=5432;Username=cataloguser;Password=catalogpass;Database=catalogdb
     healthcheck:

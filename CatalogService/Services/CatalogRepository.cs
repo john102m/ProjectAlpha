@@ -28,7 +28,8 @@ namespace CatalogService.Services
             {
                 Console.Error.WriteLine($"Error in GetProductsAsync: {ex.Message}");
                 _logger.LogError(ex, "Error in GetProductsAsync");
-                return Enumerable.Empty<Product>();
+                throw;
+
             }
         }
 

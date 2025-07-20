@@ -10,11 +10,13 @@ namespace CatalogService.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly ICatalogRepository _repo;
+        private readonly IHostEnvironment _env;
 
-        public CatalogController(IConfiguration configuration, ICatalogRepository repo)
+        public CatalogController(IConfiguration configuration, ICatalogRepository repo, IHostEnvironment env)
         {
             _configuration = configuration;
             _repo = repo;
+            _env = env;
         }
         [HttpGet("health")]
         public IActionResult Get()
@@ -26,8 +28,20 @@ namespace CatalogService.Controllers
         [HttpGet]
         public async Task<IActionResult> GetProducts()
         {
-            var products = await _repo.GetProductsAsync();
-            return Ok(products);
+            try
+            {
+                var products = await _repo.GetProductsAsync();
+                return Ok(products);
+            }
+            catch (Exception ex)
+            {
+                var detailMessage = _env.IsDevelopment() ? ex.Message : "Error";
+                return Problem(
+                    detail: detailMessage,
+                    title: "Failed to retrieve products",
+                    statusCode: 500
+                );
+            }
         }
 
         // 🔵 GET single product by ID
