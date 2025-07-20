@@ -35,7 +35,8 @@ namespace BookingService.Controllers
             {
                 BookingId = 123,
                 Username = "Test User Bobby",
-                PackageRef = 12
+                PackageRef = 12,
+                CreatedAt = DateTime.Now,
             };
 
             await _messageService.PublishBookingAsync(booking);
@@ -64,8 +65,10 @@ namespace BookingService.Controllers
             var booking = new BookingMessage
             {
                 BookingId = reservation.Id,
-                Username = reservation.GuestName, 
+                Username = reservation.GuestName,
+                Metadata = reservation.Package,
                 PackageRef = reservation.PackageId,
+                CreatedAt = DateTime.Now,
             };
             _ = _messageService.PublishBookingAsync(booking);
 

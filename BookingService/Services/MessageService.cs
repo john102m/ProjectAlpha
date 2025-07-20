@@ -30,7 +30,7 @@ namespace BookingService.Services
 
             await channel.BasicPublishAsync(exchange: "", routingKey: "booking-confirmed", body: body);
 
-            _logger.LogInformation($"📩 Booking published: #{booking.BookingId} | {booking.Username} | {booking.PackageRef}");
+            _logger.LogInformation($"📩 Booking published: #{booking.BookingId} | {booking.Username} | {booking.Metadata} | {booking.PackageRef}");
         }
 
     }

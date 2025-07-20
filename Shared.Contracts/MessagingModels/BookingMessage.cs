@@ -8,6 +8,8 @@
 
         public int PackageRef { get; set; }
 
+        public string Metadata { get; set; } = string.Empty;
+
         public DateTime CreatedAt { get; set; }
     }
 }
