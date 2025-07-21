@@ -36,7 +36,7 @@ services:
     container_name: rabbitmq
     ports:
       - "5672:5672"
-      - "15672:15672"
+      - "15672:15672"    
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
@@ -75,6 +75,7 @@ services:
       - "6000:8080"  # expose booking outwith the apigateway  eg host:6000/book/ (for gateway use host:5000/booking/book/)
     depends_on:
       - rabbitmq
+      - postgres-catalog
     networks:
       - internal
     environment:
@@ -110,6 +111,24 @@ services:
       - DOTNET_EnableAnsiColor=true
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  traveltips:
+    build:
+      context: .
+      dockerfile: TravelTipsService/Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - internal
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - DOTNET_EnableAnsiColor=true
+    healthcheck:
+      test: ["CMD-SHELL", "echo", "Health check not applicable"] # optional, since it's headless
       interval: 30s
       timeout: 5s
       retries: 3

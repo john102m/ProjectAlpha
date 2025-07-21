@@ -5,5 +5,6 @@ namespace BookingService.Services
     public interface IMessageService
     {
         Task PublishBookingAsync(BookingMessage booking);
+        Task SetupAsync();
     }
 }
