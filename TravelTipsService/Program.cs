@@ -9,7 +9,7 @@ builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(new LoggerConfiguration()
     .WriteTo.Console()
     .CreateLogger());
-builder.Services.AddHostedService<Worker>();
+builder.Services.AddHostedService<WorkerConsumer>();
 
 var host = builder.Build();
 host.Run();

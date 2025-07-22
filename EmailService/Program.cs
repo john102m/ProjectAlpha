@@ -11,7 +11,7 @@ LoggingConfigurator.Configure();
 builder.Host.UseSerilog();  // Replace default logger with Serilog
 
 builder.Services.AddControllers();
-builder.Services.AddHostedService<RabbitMqConsumerService>(); 
+builder.Services.AddHostedService<EmailConsumer>(); 
 
 var app = builder.Build();
 app.MapControllers();
