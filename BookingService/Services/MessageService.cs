@@ -55,10 +55,10 @@ namespace BookingService.Services
             await _channel!.BasicPublishAsync(
                 exchange: "booking-direct",
                 routingKey: "travel-tips",
-                body: Encoding.UTF8.GetBytes("TEST WHISPER")
+                body: Encoding.UTF8.GetBytes("PRIVATE: TEST WHISPER")
             );
 
-            _logger.LogInformation($"📩 Booking published: #{booking.BookingId} | {booking.Username} | {booking.Metadata} | {booking.PackageRef}");
+            _logger.LogInformation($"Booking published: #{booking.BookingId} | {booking.Username} | {booking.Metadata} | {booking.PackageRef}");
         }
 
         public void Dispose()

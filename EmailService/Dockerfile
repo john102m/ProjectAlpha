@@ -12,13 +12,12 @@ EXPOSE 80
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy csproj and restore dependencies
-COPY ["EmailService/EmailService.csproj", "EmailService/"]
-RUN dotnet restore "EmailService/EmailService.csproj"
-
 # Copy everything else and build
 COPY . .
 WORKDIR "/src/EmailService"
+
+# Copy csproj and restore dependencies
+RUN dotnet restore "EmailService.csproj"
 RUN dotnet build "EmailService.csproj" -c Release -o /app/build
 
 # Publish the app to a folder

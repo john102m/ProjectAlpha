@@ -57,11 +57,11 @@ public class Worker(ILogger<Worker> logger) : BackgroundService
         if (_channel is not null)
         {
             await _channel.CloseAsync(cancellationToken: cancellationToken);
-            _logger.LogInformation("🔒 Channel closed asynchronously.");
+            _logger.LogInformation("Channel closed asynchronously.");
         }
 
         _connection?.Dispose();  // Still safe to dispose connection
-        _logger.LogInformation("🛑 RabbitMQ connection disposed.");
+        _logger.LogInformation("RabbitMQ connection disposed.");
 
         await base.StopAsync(cancellationToken);
     }
@@ -91,7 +91,7 @@ public class Worker(ILogger<Worker> logger) : BackgroundService
                 catch (JsonException)
                 {
 
-                    _logger.LogInformation($"Received secret message: {jsonString}");
+                    _logger.LogInformation($"Received private message: {jsonString}");
                 }
             }
             catch (Exception ex)
@@ -103,7 +103,7 @@ public class Worker(ILogger<Worker> logger) : BackgroundService
         };
 
         await _channel!.BasicConsumeAsync("booking-tips", true, consumer);
-        _logger.LogInformation("Worker is now listening for booking-tips messages.");
+        _logger.LogInformation("Worker is now listening for booking-tips and private messages.");
 
         while (!cancellationToken.IsCancellationRequested)
         {

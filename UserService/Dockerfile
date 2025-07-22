@@ -12,13 +12,11 @@ EXPOSE 80
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy csproj and restore dependencies
-COPY ["UserService/UserService.csproj", "UserService/"]
-RUN dotnet restore "UserService/UserService.csproj"
-
 # Copy everything else and build
 COPY . .
 WORKDIR "/src/UserService"
+
+RUN dotnet restore "UserService.csproj"
 RUN dotnet build "UserService.csproj" -c Release -o /app/build
 
 # Publish the app to a folder

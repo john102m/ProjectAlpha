@@ -13,13 +13,11 @@ EXPOSE 80
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy csproj and restore dependencies
-COPY ["BookingService/BookingService.csproj", "BookingService/"]
-RUN dotnet restore "BookingService/BookingService.csproj"
-
 # Copy everything else and build
 COPY . .
 WORKDIR "/src/BookingService"
+
+RUN dotnet restore "BookingService.csproj"
 RUN dotnet build "BookingService.csproj" -c Release -o /app/build
 
 # Publish the app to a folder

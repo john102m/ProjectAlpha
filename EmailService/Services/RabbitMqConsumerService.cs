@@ -92,7 +92,7 @@ public class RabbitMqConsumerService(ILogger<RabbitMqConsumerService> logger) : 
         };
 
         await _channel.BasicConsumeAsync("booking-emails", true, consumer, cancellationToken);
-        _logger.LogInformation("Email consumer is now listening for booking messages.");
+        _logger.LogInformation("Email consumer is now listening for booking-emails messages.");
 
         while (!cancellationToken.IsCancellationRequested)
         {

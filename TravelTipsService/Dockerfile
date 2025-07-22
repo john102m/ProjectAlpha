@@ -13,13 +13,11 @@ EXPOSE 80
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy csproj and restore dependencies
-COPY ["TravelTipsService/TravelTipsService.csproj", "TravelTipsService/"]
-RUN dotnet restore "TravelTipsService/TravelTipsService.csproj"
-
 # Copy everything else and build
 COPY . .
 WORKDIR "/src/TravelTipsService"
+
+RUN dotnet restore "TravelTipsService.csproj"
 RUN dotnet build "TravelTipsService.csproj" -c Release -o /app/build
 
 # Publish the app to a folder
