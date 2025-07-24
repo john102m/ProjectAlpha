@@ -3,10 +3,10 @@
 namespace EmailService.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
-    public class HomeController : ControllerBase
+    [Route("")]
+    public class EmailController : ControllerBase
     {
-        [HttpGet]
+        [HttpGet("health")]
         public IActionResult Get() => Ok("EmailService is running!");
     }
 }
