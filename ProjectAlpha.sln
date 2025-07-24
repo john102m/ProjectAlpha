@@ -3,15 +3,26 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatalogService", "CatalogService\CatalogService.csproj", "{B56184AF-CD4D-4E57-9B3E-15BEE5672719}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CatalogService", "CatalogService\CatalogService.csproj", "{B56184AF-CD4D-4E57-9B3E-15BEE5672719}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookingService", "BookingService\BookingService.csproj", "{B34E21A2-5F84-4EB1-B142-7442280B89A4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BookingService", "BookingService\BookingService.csproj", "{B34E21A2-5F84-4EB1-B142-7442280B89A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailService", "EmailService\EmailService.csproj", "{993F8A55-A020-4862-8F70-5E80F18959BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmailService", "EmailService\EmailService.csproj", "{993F8A55-A020-4862-8F70-5E80F18959BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserService", "UserService\UserService.csproj", "{ED766934-055C-45C9-8836-3CC2190E7F82}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UserService", "UserService\UserService.csproj", "{ED766934-055C-45C9-8836-3CC2190E7F82}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiGateway", "ApiGateway\ApiGateway.csproj", "{F2C8E68C-E885-4BB3-B1FB-B38F9F209C65}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiGateway", "ApiGateway\ApiGateway.csproj", "{F2C8E68C-E885-4BB3-B1FB-B38F9F209C65}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared.Contracts", "Shared.Contracts\Shared.Contracts.csproj", "{67E8251D-890E-4F4B-84A0-EEC043474CEF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8ECA93A3-EAC9-4369-8BC8-9CE260B44190}"
+	ProjectSection(SolutionItems) = preProject
+		BaseImage\Dockerfile = BaseImage\Dockerfile
+		Readme.md = Readme.md
+		BaseImage\README.txt = BaseImage\README.txt
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TravelTipsService", "TravelTipsService\TravelTipsService.csproj", "{F10B74B1-331D-4616-BFA5-A653845E0C56}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +50,14 @@ Global
 		{F2C8E68C-E885-4BB3-B1FB-B38F9F209C65}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F2C8E68C-E885-4BB3-B1FB-B38F9F209C65}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F2C8E68C-E885-4BB3-B1FB-B38F9F209C65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67E8251D-890E-4F4B-84A0-EEC043474CEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67E8251D-890E-4F4B-84A0-EEC043474CEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67E8251D-890E-4F4B-84A0-EEC043474CEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67E8251D-890E-4F4B-84A0-EEC043474CEF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F10B74B1-331D-4616-BFA5-A653845E0C56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F10B74B1-331D-4616-BFA5-A653845E0C56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F10B74B1-331D-4616-BFA5-A653845E0C56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F10B74B1-331D-4616-BFA5-A653845E0C56}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

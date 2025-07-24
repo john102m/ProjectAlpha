@@ -1,74 +1,157 @@
+
+networks:
+  internal:
+    driver: bridge
+  public:
+    driver: bridge
+     
+volumes:
+  catalog_pgdata:
+
 services:
+  postgres-catalog:
+    image: postgres:15
+    container_name: postgres-catalog
+    ports:
+      - "5444:5432" #to allow VS2022 or pgAdmin to access postgres
+
+    environment:
+      POSTGRES_USER: cataloguser
+      POSTGRES_PASSWORD: catalogpass    
+      POSTGRES_DB: catalogdb
+    volumes:
+       - ./data/postgres:/var/lib/postgresql/data    
+    #volumes:
+      #- catalog_pgdata:/var/lib/postgresql/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cataloguser -d catalogdb"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  rabbitmq:  
+    image: rabbitmq:3-management
+    container_name: rabbitmq 
+    ports:
+      - "5672:5672"
+      - "15672:15672"    
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmqctl status || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
   catalog:
     build:
       context: .
       dockerfile: CatalogService/Dockerfile
-    ports:
-      - "5001:8080"
     depends_on:
       - rabbitmq
+      - postgres-catalog
+    networks:
+      - internal
+    ports:
+      - "5433:5432"   #temporary for dev access- 
+    environment:
+      - ConnectionStrings__CatalogDatabase=Host=postgres-catalog;Port=5432;Username=cataloguser;Password=catalogpass;Database=catalogdb
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/home"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/packages/health || exit 1"]
       interval: 30s
-      timeout: 10s
-      retries: 5 
+      timeout: 5s
+      retries: 3
 
   booking:
     build:
       context: .
       dockerfile: BookingService/Dockerfile
     ports:
-      - "5002:8080"
+      - "6000:8080"  # expose booking outwith the apigateway  eg host:6000/book/ (for gateway use host:5000/booking/book/)
     depends_on:
       - rabbitmq
+      - postgres-catalog
+    networks:
+      - internal
+    environment:
+      - RABBITMQ_HOST=rabbitmq
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/home"]  
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
   user:
     build:
       context: .
       dockerfile: UserService/Dockerfile
-    ports:
-      - "5003:8080"
+    networks:
+      - internal
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/home"]  
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
   email:
     build:
       context: .
       dockerfile: EmailService/Dockerfile
-    ports:
-      - "5004:8080"
     depends_on:
-      - rabbitmq    
+      - rabbitmq
+    networks:
+      - internal
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - DOTNET_EnableAnsiColor=true
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/home"] 
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  traveltips:
+    build:
+      context: .
+      dockerfile: TravelTipsService/Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - internal
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - DOTNET_EnableAnsiColor=true
+    healthcheck:
+      test: ["CMD-SHELL", "echo", "Health check not applicable"] # optional, since it's headless
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
   apigateway:
     build:
       context: .
       dockerfile: ApiGateway/Dockerfile
     ports:
-      - "5000:8080"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Production  
+      - "5000:8080" # exposed externally
     depends_on:
-      - rabbitmq
       - catalog
       - booking
       - user
       - email
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
-    ports:
-      - "5672:5672"     # message broker port
-      - "15672:15672"   # RabbitMQ Management UI
+      - rabbitmq
+    networks:
+      - public
+      - internal
     environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+      - ASPNETCORE_ENVIRONMENT=Production
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:15672"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/gateway/health || exit 1"]
       interval: 30s
-      timeout: 10s
-      retries: 5
+      timeout: 5s
+      retries: 3
