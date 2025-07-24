@@ -3,39 +3,40 @@ using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
+using Shared.Contracts.MessagingModels;
 using System.Text;
 using System.Text.Json;
 
-namespace Shared.Contracts.MessagingModels
+namespace Shared.Contracts.MessagingBaseClasses
 {
     /// <summary>
     /// Base class for RabbitMQ consumers used as hosted background services.
-    /// Establishes connection, binds to the queue, and delegates message handling.
+    ///
+    /// This implementation expects messages to be wrapped in a <see cref="MessageEnvelope{T}"/> structure,
+    /// which encapsulates a payload of type <typeparamref name="TPayload"/> plus metadata:
+    /// - MessageId: a unique ID for tracking
+    /// - TraceId: for cross-service telemetry
+    /// - CreatedAt: timestamp for diagnostics
+    /// - SourceService: origin of the published message
+    ///
+    /// Derived consumers should override <see cref="HandleMessageAsync(TPayload)"/> to process the payload only.
+    /// Envelope deserialization and unwrapping are handled centrally within this class.
+    /// If envelope metadata is required (e.g., for logging, tracing), override <see cref="HandleEnvelopeAsync(MessageEnvelope{TPayload})"/>.
     /// </summary>
-    /// <typeparam name="TMessage">The expected message type to deserialize.</typeparam>
-    /// <typeparam name="TConsumer">The derived consumer class type.</typeparam>
-    public abstract class RabbitMqConsumerBase<TMessage, TConsumer>(
+    /// <typeparam name="TPayload">The inner message type expected from the envelope (e.g., GenericMessage, BookingMessage)</typeparam>
+    /// <typeparam name="TConsumer">The concrete consumer type (for logging context)</typeparam>
+
+    public abstract class RabbitMqConsumerBase<TPayload, TConsumer>(
         ILogger<TConsumer> logger,
         string queueName,
         string exchangeName) : BackgroundService
     {
         private readonly ILogger<TConsumer> _logger = logger;
+        private readonly string _rabbitHost = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "localhost";
         private readonly string _queueName = queueName;
         private readonly string _exchangeName = exchangeName;
-
-        /// <summary>
-        /// Active RabbitMQ connection instance.
-        /// </summary>
         private IConnection? _connection = null;
-
-        /// <summary>
-        /// Communication channel with RabbitMQ, initialized after connection.
-        /// </summary>
         protected IChannel? Channel { get; private set; }
-
-        /// <summary>
-        /// Event-based consumer listening for incoming RabbitMQ messages.
-        /// </summary>
         protected AsyncEventingBasicConsumer? Consumer { get; private set; }
 
 
@@ -47,8 +48,7 @@ namespace Shared.Contracts.MessagingModels
         public override async Task StartAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("{Consumer} is starting...", typeof(TConsumer).Name);
-            var rabbitHost = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "localhost";
-            var factory = new ConnectionFactory() { HostName = rabbitHost };
+            var factory = new ConnectionFactory() { HostName = _rabbitHost };
 
             while (!cancellationToken.IsCancellationRequested)
             {
@@ -102,14 +102,15 @@ namespace Shared.Contracts.MessagingModels
 
                 try
                 {
-                    var message = JsonSerializer.Deserialize<TMessage>(json);
-                    if (message == null)
+                    //var envelope = JsonSerializer.Deserialize<TMessage>(json);
+                    var envelope = JsonSerializer.Deserialize<MessageEnvelope<TPayload>>(json);
+                    if (envelope!.Payload == null)
                     {
                         _logger.LogWarning("Failed to deserialize message.");
                     }
                     else
                     {
-                        await HandleMessageAsync(message);
+                        await HandleMessageAsync(envelope.Payload);
                     }
                 }
                 catch (JsonException)
@@ -148,7 +149,7 @@ namespace Shared.Contracts.MessagingModels
         /// Handles deserialized messages of type <typeparamref name="TMessage"/>.
         /// </summary>
         /// <param name="message">The strongly typed message object.</param>
-        protected abstract Task HandleMessageAsync(TMessage message);
+        protected abstract Task HandleMessageAsync(TPayload message);
 
         /// <summary>
         /// Handles raw string messages if deserialization fails.

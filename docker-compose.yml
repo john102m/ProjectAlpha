@@ -17,10 +17,10 @@ services:
 
     environment:
       POSTGRES_USER: cataloguser
-      POSTGRES_PASSWORD: catalogpass
+      POSTGRES_PASSWORD: catalogpass    
       POSTGRES_DB: catalogdb
     volumes:
-       - ./data/postgres:/var/lib/postgresql/data
+       - ./data/postgres:/var/lib/postgresql/data    
     #volumes:
       #- catalog_pgdata:/var/lib/postgresql/data
     networks:
@@ -31,9 +31,9 @@ services:
       timeout: 10s
       retries: 5
 
-  rabbitmq:
+  rabbitmq:  
     image: rabbitmq:3-management
-    container_name: rabbitmq
+    container_name: rabbitmq 
     ports:
       - "5672:5672"
       - "15672:15672"    

@@ -1,11 +1,8 @@
 ﻿using BookingService.Models;
 using BookingService.Services;
 using Microsoft.AspNetCore.Mvc;
-using RabbitMQ.Client;
+using Shared.Contracts.MessagingBaseClasses;
 using Shared.Contracts.MessagingModels;
-using System.Diagnostics;
-using System.Text;
-using System.Text.Json;
 
 namespace BookingService.Controllers
 {
@@ -15,9 +12,9 @@ namespace BookingService.Controllers
     {
         private readonly ILogger<BookingController> _logger;        
         private readonly IBookingRepository _repo;
-        private readonly IMessageService _messageService;
+        private readonly IMessagePublisher _messageService;
 
-        public BookingController(ILogger<BookingController> logger,IBookingRepository repo, IMessageService messageService)
+        public BookingController(ILogger<BookingController> logger,IBookingRepository repo, IMessagePublisher messageService)
         {
             _logger = logger;
             _repo = repo;
@@ -31,15 +28,15 @@ namespace BookingService.Controllers
         public async Task<IActionResult> PostBookingAsync()
         {
 
-            var booking = new BookingMessage
+            var message = new BaseMessage
             {
-                BookingId = 123,
+                Id = 123,
                 Username = "Test User Bobby",
-                PackageRef = 12,
+                MessageType = "12",
                 CreatedAt = DateTime.Now,
             };
 
-            await _messageService.PublishBookingAsync(booking);
+            await _messageService.PublishMessageAsync(message);
             return Ok("Booking confirmed and message sent.");
         }
 
@@ -62,15 +59,15 @@ namespace BookingService.Controllers
         public async Task<IActionResult> CreateReservation([FromBody] Reservation reservation)
         {
             var created = await _repo.CreateReservationAsync(reservation);
-            var booking = new BookingMessage
+            var message = new BaseMessage
             {
-                BookingId = reservation.Id,
+                Id = reservation.Id,
                 Username = reservation.GuestName,
                 Metadata = reservation.Package,
-                PackageRef = reservation.PackageId,
+                MessageType = reservation.PackageId.ToString(),
                 CreatedAt = DateTime.Now,
             };
-            _ = _messageService.PublishBookingAsync(booking);
+            _ = _messageService.PublishMessageAsync(message);
 
             return CreatedAtAction(nameof(GetReservation), new { id = created.Id }, created);
         }

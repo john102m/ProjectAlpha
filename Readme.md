@@ -50,3 +50,21 @@ docker-compose up -d
 docker-compose build gateway
 docker-compose up -d gateway
 ```
+
+### Messaging Infrastructure Startup
+
+To ensure our messaging layer initializes automatically with application startup, we register a custom `IHostedService`:
+
+```csharp
+public class MessagingStartupHostedService(IServiceProvider provider) : IHostedService
+{
+    public async Task StartAsync(CancellationToken cancellationToken)
+    {
+        using var scope = provider.CreateScope();
+        var publisher = scope.ServiceProvider.GetRequiredService<IMessagePublisher>();
+        await publisher.SetupAsync();
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+}
+

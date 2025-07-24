@@ -1,8 +1,9 @@
-﻿using Shared.Contracts.MessagingModels;
+﻿using Shared.Contracts.MessagingBaseClasses;
+using Shared.Contracts.MessagingModels;
 
 namespace TravelTipsService;
 
-public class WorkerConsumer(ILogger<WorkerConsumer> logger) : RabbitMqConsumerBase<BookingMessage, WorkerConsumer>(logger, _queueName, _exchangeName)
+public class WorkerConsumer(ILogger<WorkerConsumer> logger) : RabbitMqConsumerBase<BaseMessage, WorkerConsumer>(logger, _queueName, _exchangeName)
 {
     private static readonly string _queueName = "booking-tips";
     private static readonly string _exchangeName = "booking-events";
@@ -10,9 +11,9 @@ public class WorkerConsumer(ILogger<WorkerConsumer> logger) : RabbitMqConsumerBa
 
     private readonly ILogger<WorkerConsumer> _logger = logger;
 
-    protected override Task HandleMessageAsync(BookingMessage message)
+    protected override Task HandleMessageAsync(BaseMessage message)
     {
-        _logger.LogInformation($"Worker received booking #{message.BookingId} for {message.Username} → {message?.Metadata} | {message?.PackageRef}");
+        _logger.LogInformation($"Worker received booking #{message.Id} for {message.Username} → {message?.Metadata} | {message?.MessageType}");
         return Task.CompletedTask;
     }
 

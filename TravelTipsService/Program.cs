@@ -3,6 +3,7 @@ using Shared.Contracts.Common;
 using TravelTipsService;
 
 var builder = Host.CreateApplicationBuilder(args);
+
 LoggingConfigurator.Configure();
 // Set up Serilog before building the host
 builder.Logging.ClearProviders();
