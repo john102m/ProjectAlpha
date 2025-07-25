@@ -1,0 +1,9 @@
+CREATE TABLE BulletPoint (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    PageDataId INT,
+	SvgSize INT,
+    Heading NVARCHAR(255),
+	Detail NVARCHAR(255),
+    FOREIGN KEY (PageDataId) REFERENCES PageData(Id) ON DELETE CASCADE
+);
+

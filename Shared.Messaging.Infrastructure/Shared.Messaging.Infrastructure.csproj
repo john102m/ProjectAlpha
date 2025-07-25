@@ -12,4 +12,12 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.1-dev-00953" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\configuration.xml">
+      <Link>configuration.xml</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+
 </Project>

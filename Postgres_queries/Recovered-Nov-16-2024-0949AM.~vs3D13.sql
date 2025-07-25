@@ -1,0 +1,2 @@
+ALTER TABLE HomePageData
+ADD  SplashImage4 NVARCHAR(255)

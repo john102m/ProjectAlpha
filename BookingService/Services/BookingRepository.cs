@@ -68,10 +68,21 @@ namespace BookingService.Services
 
         public async Task<IEnumerable<BookingWithPackageDto>> GetEnrichedReservationsAsync()
         {
+            try
+            {
+                const string sql = @"SELECT * FROM booking.v_reservations_with_package_info";
+                using var connection = new NpgsqlConnection(_connectionString);
+                return await connection.QueryAsync<BookingWithPackageDto>(sql);
+            }
+            catch (PostgresException ex)
+            {
+                if (ex.SqlState == "42501") // permission denied
+                {
+                    throw new UnauthorizedAccessException("Booking user does not have permission to read the view.", ex);
+                }
+                throw;
+            }
 
-            const string sql = @"SELECT * FROM booking.v_reservations_with_package_info";
-            using var connection = new NpgsqlConnection(_connectionString);
-            return await connection.QueryAsync<BookingWithPackageDto>(sql);
         }
 
         public async Task<IEnumerable<BookingWithPackageDto>> SearchReservationsAsync(string searchTerm)

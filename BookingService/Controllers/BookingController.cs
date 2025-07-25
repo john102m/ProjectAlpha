@@ -88,8 +88,21 @@ namespace BookingService.Controllers
         [HttpGet("reservations/packageinfo")]
         public async Task<IActionResult> GetEnrichedReservationsAsync()
         {
-            var reservations = await _repo.GetEnrichedReservationsAsync();
-            return Ok(reservations);
+            try
+            {
+                var reservations = await _repo.GetEnrichedReservationsAsync();
+                return Ok(reservations);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogWarning(ex, "Forbidden access to reservations view.");
+                return StatusCode(403, "Access forbidden: insufficient permissions.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error in GetEnrichedReservationsAsync.");
+                return StatusCode(500, "An unexpected error occurred.");
+            }
         }
         [HttpGet("reservations/search")]
         public async Task<IActionResult> SearchReservationsByGuest([FromQuery] string searchTerm)
@@ -100,7 +113,5 @@ namespace BookingService.Controllers
             var matches = await _repo.SearchReservationsAsync(searchTerm);
             return Ok(matches);
         }
-
-
     }
 }

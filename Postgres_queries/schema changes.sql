@@ -1,0 +1,4 @@
+--CREATE SCHEMA catalog AUTHORIZATION cataloguser;
+--ALTER TABLE products SET SCHEMA catalog;
+GRANT USAGE ON SCHEMA catalog TO cataloguser;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA catalog TO cataloguser;

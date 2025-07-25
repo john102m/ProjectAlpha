@@ -18,6 +18,13 @@
   <ItemGroup>
     <ProjectReference Include="..\Shared.Contracts\Shared.Contracts.csproj" />
   </ItemGroup>
- 
+  <ItemGroup>
+    <None Include="..\configuration.xml">
+      <Link>configuration.xml</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+
 
 </Project>

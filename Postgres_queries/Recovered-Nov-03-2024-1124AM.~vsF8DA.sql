@@ -1,0 +1,2 @@
+ALTER TABLE HomePageData
+ALTER COLUMN TitleSubtext NVARCHAR(MAX)

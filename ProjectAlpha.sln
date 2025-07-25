@@ -28,6 +28,40 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TravelTipsService", "Travel
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Messaging.Infrastructure", "Shared.Messaging.Infrastructure\Shared.Messaging.Infrastructure.csproj", "{E4526603-ADEF-4749-A720-3B48C131E31F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PostgreSQL", "PostgreSQL", "{E3EA7C99-8897-4CA5-88C4-F0C92225578C}"
+	ProjectSection(SolutionItems) = preProject
+		Postgres_queries\alter table booking.sql = Postgres_queries\alter table booking.sql
+		Postgres_queries\attach_trigger.sql = Postgres_queries\attach_trigger.sql
+		Postgres_queries\booking.table.sql = Postgres_queries\booking.table.sql
+		Postgres_queries\booking.user.permissions.sql = Postgres_queries\booking.user.permissions.sql
+		Postgres_queries\bookingsbypackagename.sql = Postgres_queries\bookingsbypackagename.sql
+		Postgres_queries\booking_schema.sql = Postgres_queries\booking_schema.sql
+		Postgres_queries\check_column_types.sql = Postgres_queries\check_column_types.sql
+		Postgres_queries\column renaming.sql = Postgres_queries\column renaming.sql
+		Postgres_queries\function_search_resv.sql = Postgres_queries\function_search_resv.sql
+		Postgres_queries\guest_trigger_function.sql = Postgres_queries\guest_trigger_function.sql
+		Postgres_queries\insert data random.sql = Postgres_queries\insert data random.sql
+		Postgres_queries\insert random holidays.sql = Postgres_queries\insert random holidays.sql
+		Postgres_queries\Original-May-06-2024-0317PM.~vsA6BF.sql = Postgres_queries\Original-May-06-2024-0317PM.~vsA6BF.sql
+		Postgres_queries\Original-Nov-03-2024-1124AM.~vsF8DA.sql = Postgres_queries\Original-Nov-03-2024-1124AM.~vsF8DA.sql
+		Postgres_queries\Original-Nov-16-2024-0949AM.~vs3D13.sql = Postgres_queries\Original-Nov-16-2024-0949AM.~vs3D13.sql
+		Postgres_queries\products table.sql = Postgres_queries\products table.sql
+		Postgres_queries\Recovered-May-06-2024-0317PM.~vsA6BF.sql = Postgres_queries\Recovered-May-06-2024-0317PM.~vsA6BF.sql
+		Postgres_queries\Recovered-Nov-03-2024-1124AM.~vsF8DA.sql = Postgres_queries\Recovered-Nov-03-2024-1124AM.~vsF8DA.sql
+		Postgres_queries\Recovered-Nov-16-2024-0949AM.~vs3D13.sql = Postgres_queries\Recovered-Nov-16-2024-0949AM.~vs3D13.sql
+		Postgres_queries\resv_with_package_view.sql = Postgres_queries\resv_with_package_view.sql
+		Postgres_queries\schema changes.sql = Postgres_queries\schema changes.sql
+		Postgres_queries\search_vector-2.sql = Postgres_queries\search_vector-2.sql
+		Postgres_queries\search_vector.sql = Postgres_queries\search_vector.sql
+		Postgres_queries\select_permission.sql = Postgres_queries\select_permission.sql
+		Postgres_queries\SQLQuery1.sql = Postgres_queries\SQLQuery1.sql
+		Postgres_queries\SQLQuery2.sql = Postgres_queries\SQLQuery2.sql
+		Postgres_queries\SQLQuery3.sql = Postgres_queries\SQLQuery3.sql
+		Postgres_queries\SQLQuery4.sql = Postgres_queries\SQLQuery4.sql
+		Postgres_queries\SQLQuery7.sql = Postgres_queries\SQLQuery7.sql
+		Postgres_queries\table_renaming.sql = Postgres_queries\table_renaming.sql
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +103,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E3EA7C99-8897-4CA5-88C4-F0C92225578C} = {8ECA93A3-EAC9-4369-8BC8-9CE260B44190}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {60447FCF-9B64-4971-8394-2F560424D500}
