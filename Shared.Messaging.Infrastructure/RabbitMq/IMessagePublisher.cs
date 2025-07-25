@@ -1,7 +1,5 @@
 ﻿
-using Shared.Contracts.MessagingModels;
-
-namespace Shared.Contracts.MessagingBaseClasses
+namespace Shared.Messaging.Infrastructure.RabbitMq
 {
     public interface IMessagePublisher
     {
@@ -9,3 +7,4 @@ namespace Shared.Contracts.MessagingBaseClasses
         Task SetupAsync();
     }
 }
+

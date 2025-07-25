@@ -2,10 +2,9 @@
 using RabbitMQ.Client;
 using System.Text.Json;
 using System.Text;
-using Shared.Contracts.MessagingModels;
 using RabbitMQ.Client.Exceptions;
 
-namespace Shared.Contracts.MessagingBaseClasses
+namespace Shared.Messaging.Infrastructure.RabbitMq
 {
     /// <summary>
     /// Base class for RabbitMQ message publishers.
@@ -140,5 +139,4 @@ namespace Shared.Contracts.MessagingBaseClasses
             _connection?.Dispose();
         }
     }
-
 }

@@ -3,41 +3,40 @@ using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
-using Shared.Contracts.MessagingModels;
 using System.Text;
 using System.Text.Json;
 
-namespace Shared.Contracts.MessagingBaseClasses
+namespace Shared.Messaging.Infrastructure.RabbitMq
 {
-    /// <summary>
-    /// Base class for RabbitMQ consumers used as hosted background services.
-    ///
-    /// This implementation expects messages to be wrapped in a <see cref="MessageEnvelope{T}"/> structure,
-    /// which encapsulates a payload of type <typeparamref name="TPayload"/> plus metadata:
-    /// - MessageId: a unique ID for tracking
-    /// - TraceId: for cross-service telemetry
-    /// - CreatedAt: timestamp for diagnostics
-    /// - SourceService: origin of the published message
-    ///
-    /// Derived consumers should override <see cref="HandleMessageAsync(TPayload)"/> to process the payload only.
-    /// Envelope deserialization and unwrapping are handled centrally within this class.
-    /// If envelope metadata is required (e.g., for logging, tracing), override <see cref="HandleEnvelopeAsync(MessageEnvelope{TPayload})"/>.
-    /// </summary>
-    /// <typeparam name="TPayload">The inner message type expected from the envelope (e.g., GenericMessage, BookingMessage)</typeparam>
-    /// <typeparam name="TConsumer">The concrete consumer type (for logging context)</typeparam>
+
 
     public abstract class RabbitMqConsumerBase<TPayload, TConsumer>(
-        ILogger<TConsumer> logger,
-        string queueName,
-        string exchangeName) : BackgroundService
+        ILogger<TConsumer> logger) : BackgroundService
     {
         private readonly ILogger<TConsumer> _logger = logger;
         private readonly string _rabbitHost = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "localhost";
-        private readonly string _queueName = queueName;
-        private readonly string _exchangeName = exchangeName;
         private IConnection? _connection = null;
         protected IChannel? Channel { get; private set; }
         protected AsyncEventingBasicConsumer? Consumer { get; private set; }
+
+        /// <summary>
+        /// Provides exchange binding definitions for the consumer's queue.
+        /// Override in consumer class to declare which exchanges this queue should bind to.
+        /// </summary>
+        protected abstract List<ExchangeBinding> GetBindings();
+
+
+        /// <summary>
+        /// Handles deserialized messages of type <typeparamref name="TMessage"/>.
+        /// </summary>
+        /// <param name="message">The strongly typed message object.</param>
+        protected abstract Task HandleMessageAsync(TPayload message);
+
+        /// <summary>
+        /// Handles raw string messages if deserialization fails.
+        /// </summary>
+        /// <param name="message">Raw JSON string message.</param>
+        protected abstract Task HandleStringMessageAsync(string message);
 
 
         /// <inheritdoc />
@@ -76,16 +75,13 @@ namespace Shared.Contracts.MessagingBaseClasses
                 return;
             }
 
-            await BindQueueAsync(cancellationToken);
+            //await BindQueueAsync(cancellationToken);
+
+            await BindMultiQueueAsync(GetBindings(), cancellationToken);
 
             await base.StartAsync(cancellationToken);
         }
 
-        /// <inheritdoc />
-        /// <summary>
-        /// Executes the message consumption loop.
-        /// Deserializes messages and delegates processing to the derived implementation.
-        /// </summary>
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
             if (Channel == null)
@@ -102,7 +98,6 @@ namespace Shared.Contracts.MessagingBaseClasses
 
                 try
                 {
-                    //var envelope = JsonSerializer.Deserialize<TMessage>(json);
                     var envelope = JsonSerializer.Deserialize<MessageEnvelope<TPayload>>(json);
                     if (envelope!.Payload == null)
                     {
@@ -123,15 +118,10 @@ namespace Shared.Contracts.MessagingBaseClasses
                 }
             };
 
-            await ConsumeAsync(cancellationToken);
-
-            await Task.CompletedTask;
+            await ConsumeMultiAsync(GetBindings(), cancellationToken);
         }
 
-        /// <inheritdoc />
-        /// <summary>
-        /// Gracefully shuts down the RabbitMQ consumer and disposes resources.
-        /// </summary>
+
         public override async Task StopAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("{Consumer} is stopping...", typeof(TConsumer).Name);
@@ -145,52 +135,35 @@ namespace Shared.Contracts.MessagingBaseClasses
             _logger.LogInformation("RabbitMQ connection disposed.");
             await base.StopAsync(cancellationToken);
         }
-        /// <summary>
-        /// Handles deserialized messages of type <typeparamref name="TMessage"/>.
-        /// </summary>
-        /// <param name="message">The strongly typed message object.</param>
-        protected abstract Task HandleMessageAsync(TPayload message);
-
-        /// <summary>
-        /// Handles raw string messages if deserialization fails.
-        /// </summary>
-        /// <param name="message">Raw JSON string message.</param>
-        protected abstract Task HandleStringMessageAsync(string message);
-
-        /// <summary>
-        /// Binds the queue to the exchange using a fanout routing key.
-        /// </summary>
-        /// <param name="cancellationToken">Token for cancellation support.</param>    
-        protected virtual async Task BindQueueAsync(CancellationToken cancellationToken)
+ 
+        protected async Task BindMultiQueueAsync(
+                List<ExchangeBinding> bindings,
+                CancellationToken cancellationToken)
         {
             if (Channel is null)
                 throw new InvalidOperationException("RabbitMQ channel is null during queue binding.");
 
-            await Channel.QueueDeclareAsync(_queueName, durable: false, exclusive: false, autoDelete: false, cancellationToken: cancellationToken);
-            await Channel.QueueBindAsync(_queueName, _exchangeName, routingKey: "", cancellationToken: cancellationToken);
-
-            _logger.LogInformation("Queue '{Queue}' bound to exchange '{Exchange}'", _queueName, _exchangeName);
-            await Task.CompletedTask;
+            foreach (var binding in bindings)
+            {
+                await Channel.QueueDeclareAsync(binding.QueueName, durable: false, exclusive: false, autoDelete: false, cancellationToken: cancellationToken);
+                await Channel.QueueBindAsync(binding.QueueName, binding.ExchangeName, binding.RoutingKey ?? "", cancellationToken: cancellationToken);
+                _logger.LogInformation("Queue '{Queue}' bound to exchange '{Exchange}' with routing key '{Key}'", binding.QueueName, binding.ExchangeName, binding.RoutingKey);
+            }
         }
 
-        /// <summary>
-        /// Initiates message consumption using the configured consumer.
-        /// </summary>
-        /// <param name="cancellationToken">Token for cancellation support.</param>    
-        protected virtual async Task ConsumeAsync(CancellationToken cancellationToken)
+        protected async Task ConsumeMultiAsync(List<ExchangeBinding> bindings, CancellationToken cancellationToken)
         {
             if (Channel is null || Consumer is null)
                 throw new InvalidOperationException("RabbitMQ channel or consumer is null during queue binding.");
 
-            await Channel.BasicConsumeAsync(queue: _queueName, autoAck: true, consumer: Consumer, cancellationToken: cancellationToken);
-
-            _logger.LogInformation("New and improved virtual {Consumer} is now consuming messages on '{Queue}'", typeof(TConsumer).Name, _queueName);
-            await Task.CompletedTask;
+            foreach (var binding in bindings)
+            {
+                await Channel.BasicConsumeAsync(queue: binding.QueueName, autoAck: true, consumer: Consumer, cancellationToken: cancellationToken);
+                _logger.LogInformation("New and improved virtual {Consumer} is now consuming messages on '{Queue}'", typeof(TConsumer).Name, binding.QueueName);
+            }
         }
 
-
     }
-
 }
 
 

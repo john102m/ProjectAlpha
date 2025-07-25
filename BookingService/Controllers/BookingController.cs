@@ -1,8 +1,7 @@
 ﻿using BookingService.Models;
 using BookingService.Services;
 using Microsoft.AspNetCore.Mvc;
-using Shared.Contracts.MessagingBaseClasses;
-using Shared.Contracts.MessagingModels;
+using Shared.Messaging.Infrastructure.RabbitMq;
 
 namespace BookingService.Controllers
 {

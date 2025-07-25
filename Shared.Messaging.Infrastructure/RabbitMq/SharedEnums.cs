@@ -1,6 +1,4 @@
-﻿
-
-namespace Shared.Contracts.MessagingModels
+﻿namespace Shared.Messaging.Infrastructure.RabbitMq
 {
     public enum MessagingExchangeType
     {
@@ -11,3 +9,5 @@ namespace Shared.Contracts.MessagingModels
     }
 
 }
+
+

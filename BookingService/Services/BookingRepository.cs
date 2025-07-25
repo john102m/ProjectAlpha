@@ -68,50 +68,21 @@ namespace BookingService.Services
 
         public async Task<IEnumerable<BookingWithPackageDto>> GetEnrichedReservationsAsync()
         {
-            const string sql = @"
-        SELECT 
-            r.id,
-            r.guestname,
-            r.checkin,
-            r.checkout,
-            r.totalprice,
-            r.packageid,
-            p.name AS packageName,
-            p.description AS packageDescription,
-            p.price AS packageBasePrice
-        FROM booking.reservations r
-        JOIN catalog.packages p ON r.packageid = p.id;";
 
+            const string sql = @"SELECT * FROM booking.v_reservations_with_package_info";
             using var connection = new NpgsqlConnection(_connectionString);
             return await connection.QueryAsync<BookingWithPackageDto>(sql);
         }
 
         public async Task<IEnumerable<BookingWithPackageDto>> SearchReservationsAsync(string searchTerm)
         {
-            const string sql = @"
-        SELECT 
-            r.id,
-            r.guestname,
-            r.checkin,
-            r.checkout,
-            r.totalprice,
-            r.packageid,
-            p.name AS packageName,
-            p.description AS packageDescription,
-            p.price AS packageBasePrice
-        FROM booking.reservations r
-        JOIN catalog.packages p ON r.packageid = p.id
-        WHERE r.guest_search_vector @@ to_tsquery('english', @Query)
-        OR r.guestname ILIKE @Fallback;"; //WHERE r.guestname ILIKE @Query";
-
+            const string sql = "SELECT * FROM booking.search_reservations(@Query, @Fallback);";
             using var connection = new NpgsqlConnection(_connectionString);
             return await connection.QueryAsync<BookingWithPackageDto>(sql, new
             {
-                Query = searchTerm,                    // e.g. "oliv:*"
-                Fallback = $"%{searchTerm.Replace(":*", "")}%"  // e.g. "oliv" → "%oliv%"
+                Query = searchTerm,
+                Fallback = $"%{searchTerm.Replace(":*", "")}%"
             });
         }
-
-
     }
 }

@@ -17,12 +17,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared.Contracts", "Shared.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8ECA93A3-EAC9-4369-8BC8-9CE260B44190}"
 	ProjectSection(SolutionItems) = preProject
+		Configuration.xml = Configuration.xml
 		BaseImage\Dockerfile = BaseImage\Dockerfile
+		global-messaging.json = global-messaging.json
 		Readme.md = Readme.md
 		BaseImage\README.txt = BaseImage\README.txt
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TravelTipsService", "TravelTipsService\TravelTipsService.csproj", "{F10B74B1-331D-4616-BFA5-A653845E0C56}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TravelTipsService", "TravelTipsService\TravelTipsService.csproj", "{F10B74B1-331D-4616-BFA5-A653845E0C56}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Messaging.Infrastructure", "Shared.Messaging.Infrastructure\Shared.Messaging.Infrastructure.csproj", "{E4526603-ADEF-4749-A720-3B48C131E31F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -58,6 +62,10 @@ Global
 		{F10B74B1-331D-4616-BFA5-A653845E0C56}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F10B74B1-331D-4616-BFA5-A653845E0C56}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F10B74B1-331D-4616-BFA5-A653845E0C56}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4526603-ADEF-4749-A720-3B48C131E31F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4526603-ADEF-4749-A720-3B48C131E31F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4526603-ADEF-4749-A720-3B48C131E31F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4526603-ADEF-4749-A720-3B48C131E31F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

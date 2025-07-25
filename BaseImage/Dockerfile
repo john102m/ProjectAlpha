@@ -10,3 +10,5 @@ RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 # Optional: Set default timezone
 ENV TZ=Europe/London
 
+# Add messaging config to base
+COPY ../global-messaging.json /app/global-messaging.json

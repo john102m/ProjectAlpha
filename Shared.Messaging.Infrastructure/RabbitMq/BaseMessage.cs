@@ -1,4 +1,4 @@
-﻿namespace Shared.Contracts.MessagingModels
+﻿namespace Shared.Messaging.Infrastructure.RabbitMq
 {
     public class BaseMessage
     {

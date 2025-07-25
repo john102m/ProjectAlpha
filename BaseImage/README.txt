@@ -4,6 +4,13 @@ Your personal cheat sheet for Docker, Postgres, backups, and development sanity.
 
 ---
 
+how to build the base:
+docker build -f BaseImage/Dockerfile -t projectalpha-base:8.0 .
+check its there:
+docker run --rm -it projectalpha-base:8.0 ls /app
+
+
+
 ## 🔧 Services & Ports
 
 | Service             | Port (Host) | Description                          |

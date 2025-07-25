@@ -1,0 +1,7 @@
+<Project>
+  <ItemGroup>
+    <None Update="..\global-messaging.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

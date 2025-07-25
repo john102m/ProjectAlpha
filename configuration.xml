@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Messaging>
+  <Exchanges>
+    <BookingExchange>booking-events</BookingExchange>
+    <DirectExchange>booking-direct</DirectExchange>
+    <UserExchange>user-events</UserExchange>
+  </Exchanges>
+  <RoutingKeys>
+    <TravelTips>travel-tips</TravelTips>
+  </RoutingKeys>
+  <Queues>
+    <BookingEmails>booking-emails</BookingEmails>
+    <BookingTips>booking-tips</BookingTips>
+  </Queues>
+</Messaging>
+

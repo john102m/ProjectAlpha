@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Shared.Contracts.MessagingBaseClasses;
+using Shared.Messaging.Infrastructure.RabbitMq;
 
-namespace Shared.Contracts.ServiceExtensions
+namespace Shared.Messaging.Infrastructure.ServiceExtensions
 {
     public class MessagingStartupHostedService(IServiceProvider provider) : IHostedService
     {
