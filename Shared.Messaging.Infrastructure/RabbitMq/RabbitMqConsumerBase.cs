@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
+using Shared.Messaging.Infrastructure.Models;
 using System.Text;
 using System.Text.Json;
 

@@ -1,4 +1,6 @@
 ﻿
+using Shared.Messaging.Infrastructure.Models;
+
 namespace Shared.Messaging.Infrastructure.RabbitMq
 {
     public interface IMessagePublisher

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using Shared.Messaging.Infrastructure.Configuration;
+using Shared.Messaging.Infrastructure.Models;
 using Shared.Messaging.Infrastructure.RabbitMq;
 
 

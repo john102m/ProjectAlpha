@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Shared.Messaging.Infrastructure.Models;
 using Shared.Messaging.Infrastructure.RabbitMq;
 
 namespace UserService.Controllers

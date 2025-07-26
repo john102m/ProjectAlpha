@@ -1,4 +1,4 @@
-﻿namespace Shared.Messaging.Infrastructure.RabbitMq
+﻿namespace Shared.Messaging.Infrastructure.Models
 {
     /// <summary>
     /// Represents a single exchange binding configuration.
@@ -9,7 +9,7 @@
     /// Wrapper class to group multiple ExchangeBinding records.
     /// Ideal for config-driven or dynamic queue binding setups.
     /// </summary>
-    public class ExchangeBindingRecordsConfig
+    public class ExchangeBindingType
     {
         /// <summary>
         /// List of bindings representing exchange-to-queue relationships.

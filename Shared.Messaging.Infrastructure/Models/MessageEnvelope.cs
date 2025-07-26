@@ -1,4 +1,4 @@
-﻿namespace Shared.Messaging.Infrastructure.RabbitMq
+﻿namespace Shared.Messaging.Infrastructure.MessageModels
 {
     public class MessageEnvelope<T>
     {

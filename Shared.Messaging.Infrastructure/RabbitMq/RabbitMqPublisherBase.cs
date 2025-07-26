@@ -3,6 +3,9 @@ using RabbitMQ.Client;
 using System.Text.Json;
 using System.Text;
 using RabbitMQ.Client.Exceptions;
+using Shared.Messaging.Infrastructure.Models;
+using Shared.Messaging.Infrastructure.MessageModels;
+
 
 namespace Shared.Messaging.Infrastructure.RabbitMq
 {
@@ -29,7 +32,6 @@ namespace Shared.Messaging.Infrastructure.RabbitMq
                 _ => throw new ArgumentOutOfRangeException(nameof(type), "Unsupported exchange type.")
             };
         }
-
 
         /// <summary>
         /// Initializes RabbitMQ connection and declares specified exchanges.
@@ -77,24 +79,12 @@ namespace Shared.Messaging.Infrastructure.RabbitMq
             }
         }
 
-
         /// <summary>
         /// Publishes a message object to the specified exchange with the given routing key.
         /// </summary>
         /// <param name="exchange">Target exchange.</param>
         /// <param name="routingKey">Message routing key.</param>
         /// <param name="payload">Payload object to serialize and publish.</param>
-        //protected async Task PublishAsync(string exchange, string routingKey, object payload)
-        //{
-        //    if (_channel == null)
-        //        throw new InvalidOperationException("Channel not initialized.");
-
-        //    var json = JsonSerializer.Serialize(payload);
-        //    var body = Encoding.UTF8.GetBytes(json);
-
-        //    await _channel.BasicPublishAsync(exchange, routingKey, body);
-        //    _logger.LogInformation("Message published to '{Exchange}' with routing key '{RoutingKey}'", exchange, routingKey);
-        //}
         public async Task PublishAsync<T>(string exchangeName, string routingKey, T message)
         {
             var envelope = new MessageEnvelope<T>
@@ -128,7 +118,6 @@ namespace Shared.Messaging.Infrastructure.RabbitMq
                 cancellationToken: CancellationToken.None // Or use a real token if available
             );
         }
-
 
         /// <summary>
         /// Disposes RabbitMQ resources, including channel and connection.

@@ -21,7 +21,7 @@ namespace CatalogService.Services
             try
             {
                 using IDbConnection db = new NpgsqlConnection(_connectionString);
-                var sql = "SELECT id, name, description, price FROM catalog.packages";
+                var sql = "SELECT id, name, destination, description, nights, price, image_url FROM catalog.packages";
                 return await db.QueryAsync<Product>(sql);
             }
             catch (Exception ex)
@@ -36,7 +36,7 @@ namespace CatalogService.Services
         public async Task<Product?> GetProductByIdAsync(int id)
         {
             using IDbConnection db = new NpgsqlConnection(_connectionString);
-            var sql = "SELECT id, name, description, price FROM catalog.packages WHERE id = @Id";
+            var sql = "SELECT id, name, destination, description, nights, price, image_url FROM catalog.packages WHERE id = @Id";
             return await db.QuerySingleOrDefaultAsync<Product>(sql, new { Id = id });
         }
 

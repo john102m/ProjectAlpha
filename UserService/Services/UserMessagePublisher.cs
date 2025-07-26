@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using Shared.Messaging.Infrastructure.Configuration;
 using Shared.Messaging.Infrastructure.RabbitMq;
+using Shared.Messaging.Infrastructure.Models;
 
 
 namespace UserService.Services
@@ -9,7 +10,6 @@ namespace UserService.Services
     {
         private readonly ILogger<UserMessagePublisher> _logger;
         private readonly MessagingConfiguration _config;
-
         private readonly string _userExchangeName;
 
         public UserMessagePublisher(
