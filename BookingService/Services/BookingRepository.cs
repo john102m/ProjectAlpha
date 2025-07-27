@@ -16,18 +16,18 @@ namespace BookingService.Services
             _logger = logger;
         }
 
-        public async Task<IEnumerable<Reservation>> GetReservationsAsync()
+        public async Task<IEnumerable<ReservationView>> GetReservationsAsync()
         {
             using IDbConnection db = new NpgsqlConnection(_connectionString);
-            var sql = "SELECT id, guestname, checkin, checkout, package, packageid, totalprice FROM booking.reservations";
-            return await db.QueryAsync<Reservation>(sql);
+            var sql = @"SELECT * from booking.v_reservations_with_package_name";
+            return await db.QueryAsync<ReservationView>(sql);
         }
 
-        public async Task<Reservation?> GetReservationByIdAsync(int id)
+        public async Task<ReservationView?> GetReservationByIdAsync(int id)
         {
             using IDbConnection db = new NpgsqlConnection(_connectionString);
-            var sql = "SELECT id, guestname, checkin, checkout, package, packageid, totalprice FROM booking.reservations WHERE id = @Id";
-            return await db.QuerySingleOrDefaultAsync<Reservation>(sql, new { Id = id });
+            var sql = @"SELECT * from booking.v_reservations_with_package_name WHERE id = @Id";
+            return await db.QuerySingleOrDefaultAsync<ReservationView>(sql, new { Id = id });
         }
 
         public async Task<Reservation> CreateReservationAsync(Reservation reservation)
@@ -35,7 +35,7 @@ namespace BookingService.Services
             using IDbConnection db = new NpgsqlConnection(_connectionString);
             var sql = @"
                 INSERT INTO booking.reservations (guestname, checkin, checkout, package, packageid, totalprice)
-                VALUES (@GuestName, @CheckIn, @CheckOut, @Package, @PackageId, @TotalPrice)
+                VALUES (@GuestName, @CheckIn, @CheckOut, @ExtraInfo, @PackageId, @TotalPrice)
                 RETURNING id;";
             var id = await db.ExecuteScalarAsync<int>(sql, reservation);
             reservation.Id = id;
@@ -50,11 +50,20 @@ namespace BookingService.Services
                 SET guestname = @GuestName,
                     checkin = @CheckIn,
                     checkout = @CheckOut,
-                    package = @Package,
+                    package = @ExtraInfo,
                     packageid = @PackageId,
                     totalprice = @TotalPrice
                 WHERE id = @Id;";
-            var rows = await db.ExecuteAsync(sql, new { reservation.GuestName, reservation.CheckIn, reservation.CheckOut, reservation.Package, reservation.PackageId, reservation.TotalPrice, Id = id });
+            var rows = await db.ExecuteAsync(sql, new
+            {
+                reservation.GuestName,
+                reservation.CheckIn,
+                reservation.CheckOut,
+                reservation.ExtraInfo,
+                reservation.PackageId,
+                reservation.TotalPrice,
+                Id = id
+            });
             return rows > 0;
         }
 
@@ -70,9 +79,10 @@ namespace BookingService.Services
         {
             try
             {
-                const string sql = @"SELECT * FROM booking.v_reservations_with_package_info";
+                string sql = @"SELECT * FROM booking.v_reservations_with_package_info";
                 using var connection = new NpgsqlConnection(_connectionString);
                 return await connection.QueryAsync<BookingWithPackageDto>(sql);
+
             }
             catch (PostgresException ex)
             {
@@ -82,7 +92,25 @@ namespace BookingService.Services
                 }
                 throw;
             }
+        }
 
+        public async Task<BookingWithPackageDto> GetEnrichedReservationsByIdAsync(int id)
+        {
+            try
+            {
+                string sql = @"SELECT * FROM booking.v_reservations_with_package_info WHERE id = @Id";
+                using var connection = new NpgsqlConnection(_connectionString);
+                return await connection.QuerySingleAsync<BookingWithPackageDto>(sql, new { Id = id });
+
+            }
+            catch (PostgresException ex)
+            {
+                if (ex.SqlState == "42501") // permission denied
+                {
+                    throw new UnauthorizedAccessException("Booking user does not have permission to read the view.", ex);
+                }
+                throw;
+            }
         }
 
         public async Task<IEnumerable<BookingWithPackageDto>> SearchReservationsAsync(string searchTerm)

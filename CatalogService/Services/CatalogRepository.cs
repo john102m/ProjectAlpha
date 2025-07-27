@@ -18,63 +18,55 @@ namespace CatalogService.Services
 
         public async Task<IEnumerable<Product>> GetProductsAsync()
         {
-            try
-            {
-                using IDbConnection db = new NpgsqlConnection(_connectionString);
-                var sql = "SELECT id, name, destination, description, nights, price, image_url FROM catalog.packages";
-                return await db.QueryAsync<Product>(sql);
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error in GetProductsAsync: {ex.Message}");
-                _logger.LogError(ex, "Error in GetProductsAsync");
-                throw;
-
-            }
+            using IDbConnection db = new NpgsqlConnection(_connectionString);
+            var sql = "SELECT id, name, destination, description, nights, price, image_url AS ImageUrl FROM catalog.packages";
+            return await db.QueryAsync<Product>(sql);
         }
 
         public async Task<Product?> GetProductByIdAsync(int id)
         {
             using IDbConnection db = new NpgsqlConnection(_connectionString);
-            var sql = "SELECT id, name, destination, description, nights, price, image_url FROM catalog.packages WHERE id = @Id";
+            var sql = "SELECT id, name, destination, description, nights, price, image_url AS ImageUrl FROM catalog.packages WHERE id = @Id";
             return await db.QuerySingleOrDefaultAsync<Product>(sql, new { Id = id });
         }
 
         public async Task<Product> CreateProductAsync(Product product)
         {
-            try
-            {
-                using IDbConnection db = new NpgsqlConnection(_connectionString);
-                var sql = @"
-                INSERT INTO catalog.packages (name, description, price)
-                VALUES (@Name, @Description, @Price)
+            using IDbConnection db = new NpgsqlConnection(_connectionString);
+            var sql = @"
+                INSERT INTO catalog.packages (name, destination, description, nights, price, image_url)
+                VALUES (@Name, @Destination, @Description, @Nights, @Price, @ImageUrl)
                 RETURNING id;";
-                var id = await db.ExecuteScalarAsync<int>(sql, product);
-                product.Id = id;
-                return product;
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error in CreateProductAsync: {ex.Message}");
-                _logger.LogError(ex, "Error in CreateProductAsync");
-                return null!;
-            }
-
+            var id = await db.ExecuteScalarAsync<int>(sql, product);
+            product.Id = id;
+            return product;
         }
 
         public async Task<bool> UpdateProductAsync(int id, Product product)
         {
             using IDbConnection db = new NpgsqlConnection(_connectionString);
             var sql = @"
-            UPDATE catalog.packages
-            SET name = @Name,
-                description = @Description,
-                price = @Price
-            WHERE id = @Id;";
-            var rows = await db.ExecuteAsync(sql, new { product.Name, product.Description, product.Price, Id = id });
+                UPDATE catalog.packages
+                SET name = @Name,
+                    destination = @Destination,
+                    description = @Description,
+                    nights = @Nights,
+                    price = @Price,
+                    image_url = @ImageUrl
+                WHERE id = @Id;
+            ";
+            var parameters = new
+            {
+                product.Name,
+                product.Destination,
+                product.Description,
+                product.Nights,
+                product.Price,
+                product.ImageUrl,
+                Id = id
+            };
 
-            _logger.LogInformation("UpdateProductAsync: {Rows} updated", rows);
-
+            var rows = await db.ExecuteAsync(sql, parameters);
             return rows > 0;
         }
 
@@ -83,9 +75,6 @@ namespace CatalogService.Services
             using IDbConnection db = new NpgsqlConnection(_connectionString);
             var sql = "DELETE FROM catalog.packages WHERE id = @Id";
             var rows = await db.ExecuteAsync(sql, new { Id = id });
-
-            _logger.LogInformation("DeleteProductAsync: {Rows} deleted", rows);
-
             return rows > 0;
         }
     }
