@@ -19,14 +19,14 @@ namespace BookingService.Services
         public async Task<IEnumerable<ReservationView>> GetReservationsAsync()
         {
             using IDbConnection db = new NpgsqlConnection(_connectionString);
-            var sql = @"SELECT * from booking.v_reservations_with_package_name";
+            var sql = @"SELECT * from booking.v_reservations_with_package_name2";
             return await db.QueryAsync<ReservationView>(sql);
         }
 
         public async Task<ReservationView?> GetReservationByIdAsync(int id)
         {
             using IDbConnection db = new NpgsqlConnection(_connectionString);
-            var sql = @"SELECT * from booking.v_reservations_with_package_name WHERE id = @Id";
+            var sql = @"SELECT * from booking.v_reservations_with_package_name2 WHERE id = @Id";
             return await db.QuerySingleOrDefaultAsync<ReservationView>(sql, new { Id = id });
         }
 
@@ -34,7 +34,7 @@ namespace BookingService.Services
         {
             using IDbConnection db = new NpgsqlConnection(_connectionString);
             var sql = @"
-                INSERT INTO booking.reservations (guestname, checkin, checkout, package, packageid, totalprice)
+                INSERT INTO booking.reservations2 (guestname, checkin, checkout, package, packageid, totalprice)
                 VALUES (@GuestName, @CheckIn, @CheckOut, @ExtraInfo, @PackageId, @TotalPrice)
                 RETURNING id;";
             var id = await db.ExecuteScalarAsync<int>(sql, reservation);
@@ -46,7 +46,7 @@ namespace BookingService.Services
         {
             using IDbConnection db = new NpgsqlConnection(_connectionString);
             var sql = @"
-                UPDATE booking.reservations
+                UPDATE booking.reservations2
                 SET guestname = @GuestName,
                     checkin = @CheckIn,
                     checkout = @CheckOut,
@@ -70,7 +70,7 @@ namespace BookingService.Services
         public async Task<bool> DeleteReservationAsync(int id)
         {
             using IDbConnection db = new NpgsqlConnection(_connectionString);
-            var sql = "DELETE FROM booking.reservations WHERE id = @Id";
+            var sql = "DELETE FROM booking.reservations2 WHERE id = @Id";
             var rows = await db.ExecuteAsync(sql, new { Id = id });
             return rows > 0;
         }
@@ -79,7 +79,7 @@ namespace BookingService.Services
         {
             try
             {
-                string sql = @"SELECT * FROM booking.v_reservations_with_package_info";
+                string sql = @"SELECT * FROM booking.v_reservations_with_package_info2";
                 using var connection = new NpgsqlConnection(_connectionString);
                 return await connection.QueryAsync<BookingWithPackageDto>(sql);
 
@@ -98,7 +98,7 @@ namespace BookingService.Services
         {
             try
             {
-                string sql = @"SELECT * FROM booking.v_reservations_with_package_info WHERE id = @Id";
+                string sql = @"SELECT * FROM booking.v_reservations_with_package_info2 WHERE id = @Id";
                 using var connection = new NpgsqlConnection(_connectionString);
                 return await connection.QuerySingleAsync<BookingWithPackageDto>(sql, new { Id = id });
 
@@ -115,7 +115,7 @@ namespace BookingService.Services
 
         public async Task<IEnumerable<BookingWithPackageDto>> SearchReservationsAsync(string searchTerm)
         {
-            const string sql = "SELECT * FROM booking.search_reservations(@Query, @Fallback);";
+            const string sql = "SELECT * FROM booking.search_reservations2(@Query, @Fallback);";
             using var connection = new NpgsqlConnection(_connectionString);
             return await connection.QueryAsync<BookingWithPackageDto>(sql, new
             {

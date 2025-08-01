@@ -3,7 +3,6 @@ using Shared.Messaging.Infrastructure.Configuration;
 using Shared.Messaging.Infrastructure.Models;
 using Shared.Messaging.Infrastructure.RabbitMq;
 
-
 namespace EmailService.Services
 {
     public class EmailConsumer : RabbitMqConsumerBase<BaseMessage, EmailConsumer>

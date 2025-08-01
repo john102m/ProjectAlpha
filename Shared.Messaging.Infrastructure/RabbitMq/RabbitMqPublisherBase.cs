@@ -6,7 +6,6 @@ using RabbitMQ.Client.Exceptions;
 using Shared.Messaging.Infrastructure.Models;
 using Shared.Messaging.Infrastructure.MessageModels;
 
-
 namespace Shared.Messaging.Infrastructure.RabbitMq
 {
     /// <summary>
